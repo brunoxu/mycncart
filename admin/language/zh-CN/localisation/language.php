@@ -13,6 +13,7 @@ $_['text_edit']         = '编辑语言';
 $_['column_name']       = '语言名称';
 $_['column_code']       = '代码';
 $_['column_sort_order'] = '排序';
+$_['column_status'] = '状态';
 $_['column_action']     = '操作';
 
 // Entry

@@ -50,6 +50,7 @@
                     <?php } else { ?>
                     <a href="<?php echo $sort_sort_order; ?>"><?php echo $column_sort_order; ?></a>
                     <?php } ?></td>
+                  <td class="text-right"><?php echo $column_status; ?></td>
                   <td class="text-right"><?php echo $column_action; ?></td>
                 </tr>
               </thead>
@@ -65,6 +66,7 @@
                   <td class="text-left"><?php echo $language['name']; ?></td>
                   <td class="text-left"><?php echo $language['code']; ?></td>
                   <td class="text-right"><?php echo $language['sort_order']; ?></td>
+                  <td class="text-right"><?php echo $language['status']; ?></td>
                   <td class="text-right"><a href="<?php echo $language['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a></td>
                 </tr>
                 <?php } ?>

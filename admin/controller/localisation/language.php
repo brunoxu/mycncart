@@ -164,7 +164,8 @@ class ControllerLocalisationLanguage extends Controller {
 			'sort'  => $sort,
 			'order' => $order,
 			'start' => ($page - 1) * $this->config->get('config_limit_admin'),
-			'limit' => $this->config->get('config_limit_admin')
+			'limit' => $this->config->get('config_limit_admin'),
+			'formanagement' => 1
 		);
 
 		$language_total = $this->model_localisation_language->getTotalLanguages();
@@ -177,12 +178,13 @@ class ControllerLocalisationLanguage extends Controller {
 				'name'        => $result['name'] . (($result['code'] == $this->config->get('config_language')) ? $this->language->get('text_default') : null),
 				'code'        => $result['code'],
 				'sort_order'  => $result['sort_order'],
+				'status'  => $result['status'],
 				'edit'        => $this->url->link('localisation/language/edit', 'token=' . $this->session->data['token'] . '&language_id=' . $result['language_id'] . $url, 'SSL')
 			);
 		}
 
 		$data['heading_title'] = $this->language->get('heading_title');
-		
+
 		$data['text_list'] = $this->language->get('text_list');
 		$data['text_no_results'] = $this->language->get('text_no_results');
 		$data['text_confirm'] = $this->language->get('text_confirm');
@@ -190,6 +192,7 @@ class ControllerLocalisationLanguage extends Controller {
 		$data['column_name'] = $this->language->get('column_name');
 		$data['column_code'] = $this->language->get('column_code');
 		$data['column_sort_order'] = $this->language->get('column_sort_order');
+		$data['column_status'] = $this->language->get('column_status');
 		$data['column_action'] = $this->language->get('column_action');
 
 		$data['button_add'] = $this->language->get('button_add');
@@ -262,7 +265,7 @@ class ControllerLocalisationLanguage extends Controller {
 
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
-		
+
 		$data['text_form'] = !isset($this->request->get['language_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 		$data['text_enabled'] = $this->language->get('text_enabled');
 		$data['text_disabled'] = $this->language->get('text_disabled');

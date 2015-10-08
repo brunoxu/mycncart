@@ -274,9 +274,13 @@ class ModelLocalisationLanguage extends Model {
 		return $query->row;
 	}
 
-	public function getLanguages($data = array()) {
+	public function getLanguages($data = array(), $use_cache = FALSE) {
 		if ($data) {
-			$sql = "SELECT * FROM " . DB_PREFIX . "language";
+			$sql = "SELECT * FROM " . DB_PREFIX . "language where status=1";
+
+			if (isset($data['formanagement'])) {
+				$sql .= " or status=0";
+			}
 
 			$sort_data = array(
 				'name',
@@ -314,10 +318,10 @@ class ModelLocalisationLanguage extends Model {
 		} else {
 			$language_data = $this->cache->get('language');
 
-			if (!$language_data) {
+			if (!$use_cache || !$language_data) {
 				$language_data = array();
 
-				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "language ORDER BY sort_order, name");
+				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "language where status=1 ORDER BY sort_order, name");
 
 				foreach ($query->rows as $result) {
 					$language_data[$result['code']] = array(
@@ -339,8 +343,14 @@ class ModelLocalisationLanguage extends Model {
 		}
 	}
 
-	public function getTotalLanguages() {
-		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "language");
+	public function getTotalLanguages($data = array()) {
+		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "language where status=1";
+
+		if (isset($data['formanagement'])) {
+			$sql .= " or status=0";
+		}
+
+		$query = $this->db->query($sql);
 
 		return $query->row['total'];
 	}
