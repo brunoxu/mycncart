@@ -1,14 +1,14 @@
 <?php
 class ModelUpgrade extends Model {
 	public function mysql() {
-		// Upgrade script to upgrade mycncart to the latest version.
+		// Upgrade script to opgrade opencart to the latest version.
 		// Oldest version supported is 1.3.2
 
 		// Load the sql file
 		$file = DIR_APPLICATION . 'mycncart.sql';
 
 		if (!file_exists($file)) {
-			exit('无法加载 sql 文件: ' . $file);
+			exit('Could not load sql file: ' . $file);
 		}
 
 		$string = '';
@@ -20,10 +20,7 @@ class ModelUpgrade extends Model {
 		// Get only the create statements
 		foreach($lines as $line) {
 			// Set any prefix
-			$line = str_replace("DROP TABLE IF EXISTS `mcc_", "DROP TABLE IF EXISTS `" . DB_PREFIX, $line);
-
-			$line = str_replace("CREATE TABLE `mcc_", "CREATE TABLE `" . DB_PREFIX, $line);
-
+			$line = str_replace("CREATE TABLE IF NOT EXISTS `mcc_", "CREATE TABLE IF NOT EXISTS `" . DB_PREFIX, $line);
 
 			// If line begins with create table we want to start recording
 			if (substr($line, 0, 12) == 'CREATE TABLE') {
@@ -351,7 +348,7 @@ class ModelUpgrade extends Model {
 			$this->db->query("ALTER TABLE `" . DB_PREFIX . "product_option` CHANGE `option_value` `value` TEXT");
 			$this->db->query("ALTER TABLE `" . DB_PREFIX . "product_option` DROP `option_value`");
 		}
-		
+
 		//  Change any serialized values to json values and restore in the DB
 		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "setting`");
 
@@ -430,8 +427,33 @@ class ModelUpgrade extends Model {
 				$this->db->query("UPDATE `" . DB_PREFIX . "user_group` SET `permission` = '" . $this->db->escape(json_encode($permission)) . "' WHERE `user_group_id` = '" . (int)$result['user_group_id'] . "'");
 			}
 		}
-
-
+		// Activity
+		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "affiliate_activity`");
+		foreach ($query->rows as $result) {
+			if (preg_match('/^(a:)/', $result['data'])) {
+				$data = unserialize($result['data']);
+				$this->db->query("UPDATE `" . DB_PREFIX . "affiliate_activity` SET `data` = '" . $this->db->escape(json_encode($data)) . "' WHERE `activity_id` = '" . (int)$result['activity_id'] . "'");
+			}
+		}
+		
+		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "customer_activity`");
+		foreach ($query->rows as $result) {
+			if (preg_match('/^(a:)/', $result['data'])) {
+				$data = unserialize($result['data']);
+				$this->db->query("UPDATE `" . DB_PREFIX . "customer_activity` SET `data` = '" . $this->db->escape(json_encode($data)) . "' WHERE `activity_id` = '" . (int)$result['activity_id'] . "'");
+			}
+		}	
+		
+		// Module
+		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "module`");
+		foreach ($query->rows as $result) {
+			if (preg_match('/^(a:)/', $result['setting'])) {
+				$setting = unserialize($result['setting']);
+				$this->db->query("UPDATE `" . DB_PREFIX . "module` SET `setting` = '" . $this->db->escape(json_encode($setting)) . "' WHERE `module_id` = '" . (int)$result['module_id'] . "'");
+			}
+		}	
+		
+		
 		// Sort the categories to take advantage of the nested set model
 		$this->repairCategories(0);
 	}
