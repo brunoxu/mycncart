@@ -7,6 +7,7 @@ $_['heading_title']          = '商品';
 $_['text_success']           = '成功: 已经修改商品！';
 $_['text_list']              = '商品列表';
 $_['text_add']               = '添加商品';
+$_['text_tmall_add']         = '导入天猫商品';
 $_['text_edit']              = '编辑商品';
 $_['text_plus']              = '+';
 $_['text_minus']             = '-';
