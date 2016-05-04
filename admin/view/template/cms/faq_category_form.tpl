@@ -34,7 +34,7 @@
             <div class="tab-pane active in" id="tab-general">
               <ul class="nav nav-tabs" id="language">
                 <?php foreach ($languages as $language) { ?>
-                <li><a href="#language<?php echo $language['language_id']; ?>" data-toggle="tab"><img src="view/image/flags/<?php echo $language['image']; ?>" title="<?php echo $language['name']; ?>" /> <?php echo $language['name']; ?></a></li>
+                <li><a href="#language<?php echo $language['language_id']; ?>" data-toggle="tab"><img src="language/<?php echo $language['code']; ?>/<?php echo $language['code']; ?>.png" title="<?php echo $language['name']; ?>" /> <?php echo $language['name']; ?></a></li>
                 <?php } ?>
               </ul>
               <div class="tab-content">
@@ -209,7 +209,7 @@ $('#input-description<?php echo $language['language_id']; ?>').summernote({
 $('input[name=\'path\']').autocomplete({
 	'source': function(request, response) {
 		$.ajax({
-			url: 'index.php?route=coc/faq_category/autocomplete&token=<?php echo $token; ?>&filter_name=' +  encodeURIComponent(request),
+			url: 'index.php?route=cms/faq_category/autocomplete&token=<?php echo $token; ?>&filter_name=' +  encodeURIComponent(request),
 			dataType: 'json',
 			success: function(json) {
 				json.unshift({

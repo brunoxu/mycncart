@@ -1,7 +1,6 @@
 <?php
 class ModelCmsPressCategory extends Model {
 	public function addPressCategory($data) {
-		$this->event->trigger('pre.admin.press_category.add', $data);
 
 		$this->db->query("INSERT INTO " . DB_PREFIX . "press_category SET parent_id = '" . (int)$data['parent_id'] . "', sort_order = '" . (int)$data['sort_order'] . "', status = '" . (int)$data['status'] . "', date_modified = '".date('Y-m-d H:i:s')."', date_added = '".date('Y-m-d H:i:s')."'");
 
@@ -47,13 +46,10 @@ class ModelCmsPressCategory extends Model {
 
 		$this->cache->delete('press_category');
 
-		$this->event->trigger('post.admin.press_category.add', $press_category_id);
-
 		return $press_category_id;
 	}
 
 	public function editPressCategory($press_category_id, $data) {
-		$this->event->trigger('pre.admin.press_category.edit', $data);
 
 		$this->db->query("UPDATE " . DB_PREFIX . "press_category SET parent_id = '" . (int)$data['parent_id'] . "', sort_order = '" . (int)$data['sort_order'] . "', status = '" . (int)$data['status'] . "', date_modified = '".date('Y-m-d H:i:s')."' WHERE press_category_id = '" . (int)$press_category_id . "'");
 
@@ -142,11 +138,9 @@ class ModelCmsPressCategory extends Model {
 
 		$this->cache->delete('press_category');
 
-		$this->event->trigger('post.admin.press_category.edit', $press_category_id);
 	}
 
 	public function deletePressCategory($press_category_id) {
-		$this->event->trigger('pre.admin.press_category.delete', $press_category_id);
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "press_category_path WHERE press_category_id = '" . (int)$press_category_id . "'");
 
@@ -160,12 +154,10 @@ class ModelCmsPressCategory extends Model {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "press_category_description WHERE press_category_id = '" . (int)$press_category_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "press_category_to_store WHERE press_category_id = '" . (int)$press_category_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "press_category_to_layout WHERE press_category_id = '" . (int)$press_category_id . "'");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_press_category WHERE press_category_id = '" . (int)$press_category_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "url_alias WHERE query = 'press_category_id=" . (int)$press_category_id . "'");
 
 		$this->cache->delete('press_category');
 
-		$this->event->trigger('post.admin.press_category.delete', $press_category_id);
 	}
 
 	public function repairPressCategories($parent_id = 0) {

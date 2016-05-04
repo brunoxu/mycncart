@@ -47,7 +47,6 @@
       <?php if ($blogs) { ?>
       
         <?php foreach($blogs as $blog) { ?>
-        
           
           <?php if($cms_blog_category_page_show_image) { ?>
             <?php if ($blog['thumb']) { ?>
@@ -94,7 +93,10 @@
         
         <hr>
         <?php } ?>
-      
+        <div class="row">
+            <div class="col-sm-6 text-left"><?php echo $pagination; ?></div>
+            <div class="col-sm-6 text-right"><?php echo $results; ?></div>
+        </div>
       <?php } else { ?>
       <p><?php echo $text_empty; ?></p>
       <div class="buttons">

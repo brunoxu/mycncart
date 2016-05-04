@@ -15,7 +15,7 @@ class ControllerBlogCategory extends Controller {
 			$page = 1;
 		}
 
-		$limit = $this->config->get('config_product_limit');
+		$limit = $this->config->get('cms_blog_items_per_page');
 		
 
 		$data['breadcrumbs'] = array();
@@ -30,7 +30,7 @@ class ControllerBlogCategory extends Controller {
 			'href' => $this->url->link('blog/all')
 		);
 
-		if (isset($this->request->get['path'])) {
+		if (isset($this->request->get['way'])) {
 			$url = '';
 
 
@@ -38,25 +38,25 @@ class ControllerBlogCategory extends Controller {
 				$url .= '&limit=' . $this->request->get['limit'];
 			}
 
-			$path = '';
+			$way = '';
 
-			$parts = explode('_', (string)$this->request->get['path']);
+			$parts = explode('_', (string)$this->request->get['way']);
 
 			$blog_category_id = (int)array_pop($parts);
 
-			foreach ($parts as $path_id) {
-				if (!$path) {
-					$path = (int)$path_id;
+			foreach ($parts as $way_id) {
+				if (!$way) {
+					$way = (int)$way_id;
 				} else {
-					$path .= '_' . (int)$path_id;
+					$way .= '_' . (int)$way_id;
 				}
 
-				$blog_category_info = $this->model_blog_category->getBlogCategory($path_id);
+				$blog_category_info = $this->model_blog_category->getBlogCategory($way_id);
 
 				if ($blog_category_info) {
 					$data['breadcrumbs'][] = array(
 						'text' => $blog_category_info['name'],
-						'href' => $this->url->link('blog/category', 'path=' . $path . $url)
+						'href' => $this->url->link('blog/category', 'way=' . $way . $url)
 					);
 				}
 			}
@@ -87,7 +87,7 @@ class ControllerBlogCategory extends Controller {
 			// Set the last blog category breadcrumb
 			$data['breadcrumbs'][] = array(
 				'text' => $blog_category_info['name'],
-				'href' => $this->url->link('blog/category', 'path=' . $this->request->get['path'])
+				'href' => $this->url->link('blog/category', 'way=' . $this->request->get['way'])
 			);
 
 
@@ -161,9 +161,9 @@ class ControllerBlogCategory extends Controller {
 
 				$users = $this->model_blog_blog->getUsers();
 				
-				//$comment_count = $this->model_blog_blog->getBlogTotalComments($result['blog_id']);
+				$this->load->model('blog/comment');
 				
-				$comment_count = 0;
+				$comment_count = $this->model_blog_comment->getTotalCommentsByBlogId($result['blog_id']);
 				
 				$data['blogs'][] = array(
 					'blog_id'  			=> $result['blog_id'],
@@ -182,7 +182,7 @@ class ControllerBlogCategory extends Controller {
 					'sort_order'   		=> $result['sort_order'],
 					'date_added'   		=> $result['date_added'],
 					'date_modified' 	=> $result['date_modified'],
-					'link'				=> $this->url->link('blog/blog', 'blog_id='.$result['blog_id'], 'SSL'),
+					'link'				=> $this->url->link('blog/blog', 'blog_id='.$result['blog_id'], true),
 					
 				);
 			}
@@ -211,7 +211,7 @@ class ControllerBlogCategory extends Controller {
 		
 					$children_data[] = array(
 						'name'  => $child['name'],
-						'href'  => $this->url->link('blog/category', 'path=' . $category['blog_category_id'] . '_' . $child['blog_category_id'])
+						'href'  => $this->url->link('blog/category', 'way=' . $category['blog_category_id'] . '_' . $child['blog_category_id'])
 					);
 				}
 		
@@ -219,7 +219,7 @@ class ControllerBlogCategory extends Controller {
 				$data['categories'][] = array(
 					'name'     => $category['name'],
 					'children' => $children_data,
-					'href'     => $this->url->link('blog/category', 'path=' . $category['blog_category_id'])
+					'href'     => $this->url->link('blog/category', 'way=' . $category['blog_category_id'])
 				);
 				
 			}
@@ -228,7 +228,7 @@ class ControllerBlogCategory extends Controller {
 			$pagination->total = $blog_total;
 			$pagination->page = $page;
 			$pagination->limit = $limit;
-			$pagination->url = $this->url->link('blog/category', 'path=' . $this->request->get['path'] . $url . '&page={page}');
+			$pagination->url = $this->url->link('blog/category', 'way=' . $this->request->get['way'] . $url . '&page={page}');
 
 			$data['pagination'] = $pagination->render();
 
@@ -236,15 +236,15 @@ class ControllerBlogCategory extends Controller {
 
 			// http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html
 			if ($page == 1) {
-			    $this->document->addLink($this->url->link('blog/category', 'path=' . $blog_category_info['blog_category_id'], 'SSL'), 'canonical');
+			    $this->document->addLink($this->url->link('blog/category', 'way=' . $blog_category_info['blog_category_id'], true), 'canonical');
 			} elseif ($page == 2) {
-			    $this->document->addLink($this->url->link('blog/category', 'path=' . $blog_category_info['blog_category_id'], 'SSL'), 'prev');
+			    $this->document->addLink($this->url->link('blog/category', 'way=' . $blog_category_info['blog_category_id'], true), 'prev');
 			} else {
-			    $this->document->addLink($this->url->link('blog/category', 'path=' . $blog_category_info['blog_category_id'] . '&page='. ($page - 1), 'SSL'), 'prev');
+			    $this->document->addLink($this->url->link('blog/category', 'way=' . $blog_category_info['blog_category_id'] . '&page='. ($page - 1), true), 'prev');
 			}
 
 			if ($limit && ceil($blog_total / $limit) > $page) {
-			    $this->document->addLink($this->url->link('blog/category', 'path=' . $blog_category_info['blog_category_id'] . '&page='. ($page + 1), 'SSL'), 'next');
+			    $this->document->addLink($this->url->link('blog/category', 'way=' . $blog_category_info['blog_category_id'] . '&page='. ($page + 1), true), 'next');
 			}
 
 			$data['limit'] = $limit;
@@ -260,16 +260,12 @@ class ControllerBlogCategory extends Controller {
 			$data['footer'] = $this->load->controller('common/footer');
 			$data['header'] = $this->load->controller('common/header');
 
-			if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/blog/category.tpl')) {
-				$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/blog/category.tpl', $data));
-			} else {
-				$this->response->setOutput($this->load->view('default/template/blog/category.tpl', $data));
-			}
+			$this->response->setOutput($this->load->view('blog/category', $data));
 		} else {
 			$url = '';
 
-			if (isset($this->request->get['path'])) {
-				$url .= '&path=' . $this->request->get['path'];
+			if (isset($this->request->get['way'])) {
+				$url .= '&way=' . $this->request->get['way'];
 			}
 
 			if (isset($this->request->get['page'])) {
@@ -304,11 +300,7 @@ class ControllerBlogCategory extends Controller {
 			$data['footer'] = $this->load->controller('common/footer');
 			$data['header'] = $this->load->controller('common/header');
 
-			if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/error/not_found.tpl')) {
-				$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/error/not_found.tpl', $data));
-			} else {
-				$this->response->setOutput($this->load->view('default/template/error/not_found.tpl', $data));
-			}
+			$this->response->setOutput($this->load->view('error/not_found', $data));
 		}
 	}
 }

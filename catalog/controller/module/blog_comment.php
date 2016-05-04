@@ -35,11 +35,8 @@ class ControllerModuleBlogComment extends Controller {
 				);
 			}
 
-			if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/module/blog_comment.tpl')) {
-				return $this->load->view($this->config->get('config_template') . '/template/module/blog_comment.tpl', $data);
-			} else {
-				return $this->load->view('default/template/module/blog_comment.tpl', $data);
-			}
+			return $this->load->view('module/blog_comment', $data);
+			
 		}
 	}
 }

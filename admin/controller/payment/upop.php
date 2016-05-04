@@ -6,7 +6,7 @@ class ControllerPaymentUpop extends Controller {
 		
 		if($this->config->get('upop_pay_name') == ''){
 			
-			$this->language->load('payment/upop');
+			$this->load->language('payment/upop');
 		
 			$this->config->set('upop_pay_name',$this->language->get('default_pay_name'));
 			
@@ -23,7 +23,7 @@ class ControllerPaymentUpop extends Controller {
 		}
 		
 		
-		$this->language->load('payment/upop');
+		$this->load->language('payment/upop');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 		
@@ -34,7 +34,7 @@ class ControllerPaymentUpop extends Controller {
 			
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL'));
+			$this->response->redirect($this->url->link('extension/payment', 'token=' . $this->session->data['token'], true));
 		}
 
 		$data['heading_title'] = $this->language->get('heading_title');
@@ -105,25 +105,25 @@ class ControllerPaymentUpop extends Controller {
 
    		$data['breadcrumbs'][] = array(
        		'text'      => $this->language->get('text_home'),
-			'href'      => $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
+			'href'      => $this->url->link('common/home', 'token=' . $this->session->data['token'], true),
       		'separator' => false
    		);
 
    		$data['breadcrumbs'][] = array(
        		'text'      => $this->language->get('text_payment'),
-			'href'      => $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL'),
+			'href'      => $this->url->link('extension/payment', 'token=' . $this->session->data['token'], true),
       		'separator' => ' :: '
    		);
 
    		$data['breadcrumbs'][] = array(
        		'text'      => $this->language->get('heading_title'),
-			'href'      => $this->url->link('payment/upop', 'token=' . $this->session->data['token'], 'SSL'),      		
+			'href'      => $this->url->link('payment/upop', 'token=' . $this->session->data['token'], true),      		
       		'separator' => ' :: '
    		);
 				
-		$data['action'] = $this->url->link('payment/upop', 'token=' . $this->session->data['token'], 'SSL');
+		$data['action'] = $this->url->link('payment/upop', 'token=' . $this->session->data['token'], true);
 		
-		$data['cancel'] = $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL');
+		$data['cancel'] = $this->url->link('extension/payment', 'token=' . $this->session->data['token'], true);
 		
 		
 	
@@ -238,12 +238,12 @@ class ControllerPaymentUpop extends Controller {
 			$data['upop_sort_order'] = $this->config->get('upop_sort_order');
 		}
 
-		$this->template = 'payment/upop.tpl';
+		$this->template = 'payment/upop';
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');		
-		$this->response->setOutput($this->load->view('payment/upop.tpl', $data));
+		$this->response->setOutput($this->load->view('payment/upop', $data));
 	}
 
 	protected function validate() {

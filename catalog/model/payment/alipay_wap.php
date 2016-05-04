@@ -18,7 +18,11 @@ class ModelPaymentAlipayWap extends Model {
 		//判断是否移动设备访问
 		$this->load->helper('mobile');
 		if (is_mobile()) {
-			$status = true;
+			if (is_weixin()) {
+				$status = false;
+			}else{
+				$status = true;
+			}
 		}else{
 			$status = false;
 		}
@@ -27,7 +31,7 @@ class ModelPaymentAlipayWap extends Model {
 			'CNY',
 		);
 
-		if (!in_array(strtoupper($this->currency->getCode()), $currencies)) {
+		if (!in_array(strtoupper($this->session->data['currency']), $currencies)) {
 			$status = false;
 		}
 

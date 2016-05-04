@@ -1,7 +1,6 @@
 <?php
-class ModelCocFaqCategory extends Model {
+class ModelCmsFaqCategory extends Model {
 	public function addFaqCategory($data) {
-		$this->event->trigger('pre.admin.faq_category.add', $data);
 
 		$this->db->query("INSERT INTO " . DB_PREFIX . "faq_category SET parent_id = '" . (int)$data['parent_id'] . "',  sort_order = '" . (int)$data['sort_order'] . "', status = '" . (int)$data['status'] . "', date_modified = NOW(), date_added = NOW()");
 
@@ -46,13 +45,10 @@ class ModelCocFaqCategory extends Model {
 
 		$this->cache->delete('faq_category');
 
-		$this->event->trigger('post.admin.faq_category.add', $faq_category_id);
-
 		return $faq_category_id;
 	}
 
 	public function editFaqCategory($faq_category_id, $data) {
-		$this->event->trigger('pre.admin.faq_category.edit', $data);
 
 		$this->db->query("UPDATE " . DB_PREFIX . "faq_category SET parent_id = '" . (int)$data['parent_id'] . "', sort_order = '" . (int)$data['sort_order'] . "', status = '" . (int)$data['status'] . "', date_modified = NOW() WHERE faq_category_id = '" . (int)$faq_category_id . "'");
 
@@ -140,11 +136,9 @@ class ModelCocFaqCategory extends Model {
 
 		$this->cache->delete('faq_category');
 
-		$this->event->trigger('post.admin.faq_category.edit', $faq_category_id);
 	}
 
 	public function deleteFaqCategory($faq_category_id) {
-		$this->event->trigger('pre.admin.faq_category.delete', $faq_category_id);
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "faq_category_path WHERE faq_category_id = '" . (int)$faq_category_id . "'");
 
@@ -158,12 +152,11 @@ class ModelCocFaqCategory extends Model {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "faq_category_description WHERE faq_category_id = '" . (int)$faq_category_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "faq_category_to_store WHERE faq_category_id = '" . (int)$faq_category_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "faq_category_to_layout WHERE faq_category_id = '" . (int)$faq_category_id . "'");
-		$this->db->query("DELETE FROM " . DB_PREFIX . "question_to_faq_category WHERE faq_category_id = '" . (int)$faq_category_id . "'");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "faq_to_faq_category WHERE faq_category_id = '" . (int)$faq_category_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "url_alias WHERE query = 'faq_category_id=" . (int)$faq_category_id . "'");
 
 		$this->cache->delete('faq_category');
 
-		$this->event->trigger('post.admin.faq_category.delete', $faq_category_id);
 	}
 
 	public function repairFaqCategories($parent_id = 0) {
