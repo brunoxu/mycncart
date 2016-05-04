@@ -26,6 +26,7 @@ class ControllerBlogBlog extends Controller {
 
 		$this->load->model('blog/blog');
 		$this->load->model('tool/image');
+		$this->load->model('catalog/product');
 
 		$blog_info = $this->model_blog_blog->getBlog($blog_id);
 
@@ -63,20 +64,35 @@ class ControllerBlogBlog extends Controller {
 			$data['text_hits'] = $this->language->get('text_hits');
 			$data['text_comment_count'] = $this->language->get('text_comment_count');
 			$data['text_write'] = $this->language->get('text_write');
-			$data['text_login'] = sprintf($this->language->get('text_login'), $this->url->link('account/login', '', 'SSL'), $this->url->link('account/register', '', 'SSL'));
+			$data['text_login'] = sprintf($this->language->get('text_login'), $this->url->link('account/login', '', true), $this->url->link('account/register', '', true));
 			$data['text_note'] = $this->language->get('text_note');
 			$data['text_loading'] = $this->language->get('text_loading');
 			$data['text_blog_category'] = $this->language->get('text_blog_category');
+			$data['text_tags'] = $this->language->get('text_tags');
+			$data['text_related_product'] = $this->language->get('text_related_product');
+			$data['text_related_blog'] = $this->language->get('text_related_blog');
 			
 			$data['entry_name'] = $this->language->get('entry_name');
 			$data['entry_comment'] = $this->language->get('entry_comment');
 			
+			$data['button_cart'] = $this->language->get('button_cart');
+			$data['button_wishlist'] = $this->language->get('button_wishlist');
+			$data['button_compare'] = $this->language->get('button_compare');
 			$data['button_continue'] = $this->language->get('button_continue');
+			
+			$data['logged'] = $this->customer->isLogged();
 			
 			$data['blog_id'] = $this->request->get['blog_id'];
 			
-			//$comment_count = $this->model_blog_blog->getBlogTotalComments($result['blog_id']);
-			$data['comment_count'] = 0;
+			if($this->customer->isLogged()) {
+				$data['name'] = $this->customer->getFullName();
+			}else{
+				$data['name'] = '';
+			}
+			
+			$this->load->model('blog/comment');
+				
+			$data['comment_count'] = $this->model_blog_comment->getTotalCommentsByBlogId($this->request->get['blog_id']);
 			
 			if ($blog_info['image']) {
 				
@@ -152,54 +168,70 @@ class ControllerBlogBlog extends Controller {
 			} else {
 				$data['captcha'] = '';
 			}
+			
+			//Related Blogs
+			$data['related_blogs'] = array();
 
-
+			$results = $this->model_blog_blog->getBlogRelated($this->request->get['blog_id']);
+			
+			foreach ($results as $result) {
+				$data['related_blogs'][] = array(
+					'blog_id'  		=> $result['blog_id'],
+					'title'       	=> html_entity_decode($result['title']),
+					'href'        	=> $this->url->link('blog/blog', 'blog_id=' . $result['blog_id'])
+				);
+			}
+			
+			//Related Products
 			$data['products'] = array();
 
 			$results = $this->model_blog_blog->getBlogProductRelated($this->request->get['blog_id']);
 
 			foreach ($results as $result) {
-				if ($result['image']) {
-					$image = $this->model_tool_image->resize($result['image'], $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
+				
+				$product_info = $this->model_catalog_product->getProduct($result['related_id']);
+				
+				if ($product_info['image']) {
+					$image = $this->model_tool_image->resize($product_info['image'], $this->config->get($this->config->get('config_theme') . '_image_related_width'), $this->config->get($this->config->get('config_theme') . '_image_related_height'));
 				} else {
-					$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('config_image_related_width'), $this->config->get('config_image_related_height'));
+					$image = $this->model_tool_image->resize('placeholder.png', $this->config->get($this->config->get('config_theme') . '_image_related_width'), $this->config->get($this->config->get('config_theme') . '_image_related_height'));
 				}
 
 				if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
-					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')));
+					$price = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 				} else {
 					$price = false;
 				}
 
-				if ((float)$result['special']) {
-					$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')));
+				if ((float)$product_info['special']) {
+					$special = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 				} else {
 					$special = false;
 				}
 
 				if ($this->config->get('config_tax')) {
-					$tax = $this->currency->format((float)$result['special'] ? $result['special'] : $result['price']);
+					$tax = $this->currency->format((float)$product_info['special'] ? $product_info['special'] : $product_info['price']);
 				} else {
 					$tax = false;
 				}
 
 				if ($this->config->get('config_review_status')) {
-					$rating = (int)$result['rating'];
+					$rating = (int)$product_info['rating'];
 				} else {
 					$rating = false;
 				}
 
 				$data['products'][] = array(
-					'product_id'  => $result['product_id'],
+					'product_id'  => $product_info['product_id'],
 					'thumb'       => $image,
-					'name'        => $result['name'],
-					'description' => utf8_substr(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8')), 0, $this->config->get('config_product_description_length')) . '..',
+					'name'        => $product_info['name'],
+					'description' => utf8_substr(strip_tags(html_entity_decode($product_info['description'], ENT_QUOTES, 'UTF-8')), 0, $this->config->get($this->config->get('config_theme') . '_product_description_length')) . '..',
 					'price'       => $price,
 					'special'     => $special,
 					'tax'         => $tax,
-					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
+					'minimum'     => $product_info['minimum'] > 0 ? $product_info['minimum'] : 1,
 					'rating'      => $rating,
-					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
+					'href'        => $this->url->link('product/product', 'product_id=' . $product_info['product_id'])
 				);
 			}
 
@@ -211,7 +243,7 @@ class ControllerBlogBlog extends Controller {
 				foreach ($tags as $tag) {
 					$data['tags'][] = array(
 						'tag'  => trim($tag),
-						'href' => $this->url->link('blog/search', 'tag=' . trim($tag))
+						'href' => $this->url->link('blog/all', 'tag=' . trim($tag))
 					);
 				}
 			}
@@ -237,7 +269,7 @@ class ControllerBlogBlog extends Controller {
 		
 					$children_data[] = array(
 						'name'  => $child['name'],
-						'href'  => $this->url->link('blog/category', 'path=' . $category['blog_category_id'] . '_' . $child['blog_category_id'])
+						'href'  => $this->url->link('blog/category', 'way=' . $category['blog_category_id'] . '_' . $child['blog_category_id'])
 					);
 				}
 		
@@ -245,7 +277,7 @@ class ControllerBlogBlog extends Controller {
 				$data['categories'][] = array(
 					'name'     => $category['name'],
 					'children' => $children_data,
-					'href'     => $this->url->link('blog/category', 'path=' . $category['blog_category_id'])
+					'href'     => $this->url->link('blog/category', 'way=' . $category['blog_category_id'])
 				);
 				
 			}
@@ -257,11 +289,7 @@ class ControllerBlogBlog extends Controller {
 			$data['footer'] = $this->load->controller('common/footer');
 			$data['header'] = $this->load->controller('common/header');
 
-			if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/blog/blog.tpl')) {
-				$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/blog/blog.tpl', $data));
-			} else {
-				$this->response->setOutput($this->load->view('default/template/blog/blog.tpl', $data));
-			}
+			$this->response->setOutput($this->load->view('blog/blog', $data));
 		} else {
 			$url = '';
 
@@ -301,11 +329,7 @@ class ControllerBlogBlog extends Controller {
 			$data['footer'] = $this->load->controller('common/footer');
 			$data['header'] = $this->load->controller('common/header');
 
-			if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/error/not_found.tpl')) {
-				$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/error/not_found.tpl', $data));
-			} else {
-				$this->response->setOutput($this->load->view('default/template/error/not_found.tpl', $data));
-			}
+			$this->response->setOutput($this->load->view('error/not_found', $data));
 		}
 	}
 
@@ -346,11 +370,7 @@ class ControllerBlogBlog extends Controller {
 
 		$data['results'] = sprintf($this->language->get('text_pagination'), ($comment_total) ? (($page - 1) * 5) + 1 : 0, ((($page - 1) * 5) > ($comment_total - 5)) ? $comment_total : ((($page - 1) * 5) + 5), $comment_total, ceil($comment_total / 5));
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/blog/comment.tpl')) {
-			$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/blog/comment.tpl', $data));
-		} else {
-			$this->response->setOutput($this->load->view('default/template/blog/comment.tpl', $data));
-		}
+		$this->response->setOutput($this->load->view('blog/comment', $data));
 	}
 
 	public function write() {

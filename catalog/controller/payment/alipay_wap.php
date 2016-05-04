@@ -22,7 +22,7 @@ class ControllerPaymentAlipayWap extends Controller {
 		
 		$this->load->helper('alipay_wap_rsa');
 		
-		$this->language->load('payment/alipay_wap');
+		$this->load->language('payment/alipay_wap');
 
 		$data['button_confirm'] = $this->language->get('button_confirm');
 		
@@ -90,11 +90,8 @@ class ControllerPaymentAlipayWap extends Controller {
 		
 		$alipaywapsubmit = new AlipayWapSubmit($alipay_config);
 		$data['html_text'] = $alipaywapsubmit->buildRequestForm($parameter, "get", $this->language->get('button_confirm'));
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/alipay_wap.tpl')) {
-			return $this->load->view($this->config->get('config_template') . '/template/payment/alipay_wap.tpl', $data);
-		} else {
-			return $this->load->view('default/template/payment/alipay_wap.tpl', $data);
-		}
+		
+		return $this->load->view('payment/alipay_wap', $data);
 		
 	}
 	

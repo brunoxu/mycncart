@@ -110,6 +110,9 @@
         <li><a href="<?php echo $category['href']; ?>"><?php echo $category['name']; ?></a></li>
         <?php } ?>
         <?php } ?>
+        <li><a href="<?php echo $blog; ?>"><?php echo $text_blog; ?></a></li>
+        <li><a href="<?php echo $press; ?>"><?php echo $text_press; ?></a></li>
+        <li><a href="<?php echo $faq; ?>"><?php echo $text_faq; ?></a></li>
       </ul>
     </div>
   </nav>

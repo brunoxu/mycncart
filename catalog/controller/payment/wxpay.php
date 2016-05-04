@@ -3,16 +3,21 @@ class ControllerPaymentWxPay extends Controller {
 	public function index() {
 		
 		//echo "one";
-		$this->load->library('wxpayexception');
+		//$this->load->library('wxpayexception');
+		require_once(DIR_SYSTEM.'library/wxpayexception.php');
 		//echo "two";
-		$this->load->library('wxpayconfig');
+		//$this->load->library('wxpayconfig');
+		require_once(DIR_SYSTEM.'library/wxpayconfig.php');
 		//echo "three";
-		$this->load->library('wxpaydata');
+		//$this->load->library('wxpaydata');
+		require_once(DIR_SYSTEM.'library/wxpaydata.php');
 		//echo "four";
-		$this->load->library('wxpayapi');
+		//$this->load->library('wxpayapi');
+		require_once(DIR_SYSTEM.'library/wxpayapi.php');
 		//echo "five";
 		
-		$this->load->library('wxpayjsapipay');
+		//$this->load->library('wxpayjsapipay');
+		require_once(DIR_SYSTEM.'library/wxpayjsapipay.php');
 		//echo "six";
 
 
@@ -29,7 +34,7 @@ class ControllerPaymentWxPay extends Controller {
 		*/
 		
 		//echo "2";
-		$this->language->load('payment/wxpay');
+		$this->load->language('payment/wxpay');
 
 		$data['button_confirm'] = $this->language->get('button_confirm');
 		
@@ -123,11 +128,7 @@ class ControllerPaymentWxPay extends Controller {
 		$data['return_url'] = $this->url->link('checkout/success');
 		$data['checkout_url'] = $this->url->link('checkout/checkout');	
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/wxpay.tpl')) {
-			return $this->load->view($this->config->get('config_template') . '/template/payment/wxpay.tpl', $data);
-		} else {
-			return $this->load->view('default/template/payment/wxpay.tpl', $data);
-		}
+		return $this->load->view('payment/wxpay', $data);
 		
 	}
 	
@@ -140,37 +141,43 @@ class ControllerPaymentWxPay extends Controller {
 			$this->log->write('WxPay :: One: ');
 		}
 		
-		$this->load->library('wxpayexception');
+		//$this->load->library('wxpayexception');
+		require_once(DIR_SYSTEM.'library/wxpayexception.php');
 		
 		if($log) {
 			$this->log->write('WxPay :: Two: ');
 		}
 		
-		$this->load->library('wxpayconfig');
+		//$this->load->library('wxpayconfig');
+		require_once(DIR_SYSTEM.'library/wxpayconfig.php');
 		
 		if($log) {
 			$this->log->write('WxPay :: Three: ');
 		}
 		
-		$this->load->library('wxpaydata');
+		//$this->load->library('wxpaydata');
+		require_once(DIR_SYSTEM.'library/wxpaydata.php');
 		
 		if($log) {
 			$this->log->write('WxPay :: Four: ');
 		}
 		
-		$this->load->library('wxpaynotify');
+		//$this->load->library('wxpaynotify');
+		require_once(DIR_SYSTEM.'library/wxpaynotify.php');
 		
 		if($log) {
 			$this->log->write('WxPay :: Five: ');
 		}
 		
-		$this->load->library('wxpayapi');
+		//$this->load->library('wxpayapi');
+		require_once(DIR_SYSTEM.'library/wxpayapi.php');
 		
 		if($log) {
 			$this->log->write('WxPay :: Six: ');
 		}
 		
-		$this->load->library('wxpaynotifycallback');
+		//$this->load->library('wxpaynotifycallback');
+		require_once(DIR_SYSTEM.'library/wxpaynotifycallback.php');
 		
 		if($log) {
 			$this->log->write('WxPay :: Seven: ');
@@ -230,14 +237,17 @@ class ControllerPaymentWxPay extends Controller {
 						
 						$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', true);
 						
-						$this->log->write('WxPay :: 2: ');
+						if($log) {
+							$this->log->write('WxPay :: 2: ');
+						}
 						
 					} else {
 						
 						$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', true);
 						
-						$this->log->write('WxPay :: 3: ');
-						
+						if($log) {
+							$this->log->write('WxPay :: 3: ');
+						}
 					}
 					
 					//清除sesssion，避免客户返回不到成功页面而无法清除原有的购物车等信息
@@ -276,7 +286,9 @@ class ControllerPaymentWxPay extends Controller {
 			
 		}else{
 			
-			$this->log->write('WxPay :: Nine: '.$result);
+			if($log) {
+				$this->log->write('WxPay :: Nine: '.$result);
+			}
 			
 		}
 		
@@ -286,158 +298,6 @@ class ControllerPaymentWxPay extends Controller {
 		
 	}
 	
-	public function callbackbak() {
-		
-		$this->load->helper('alipay_dt_core');
-		$this->load->helper('alipay_dt_md');	
-		
-		$alipay_config['partner']	=	$this->config->get('alipay_direct_partner');
-
-		$alipay_config['key']		=	$this->config->get('alipay_direct_security_code');
-		
-		$alipay_config['sign_type']    = strtoupper('MD5');
-		
-		$alipay_config['input_charset']= strtolower('utf-8');
-		
-		$alipay_config['cacert']    = getcwd().'\\cacert.pem';
-		
-		$alipay_config['transport']    = HTTPS_SERVER;
-		
-		$log = $this->config->get('alipay_direct_log');
-		
-		if($log) {
-			$this->log->write('Alipay_Direct :: One: ');
-		}
-		
-		$this->load->library('alipaydtnotify');
-		
-		$alipayNotify = new Alipaydtnotify($alipay_config);
-		$verify_result = $alipayNotify->verifyNotify();
-		
-		if($log) {
-			$this->log->write('Alipay_Direct :: Two: ' . $verify_result);
-		}
-		
-		
-		
-		if($verify_result) {
-					
-			$out_trade_no = $this->request->post['out_trade_no'];
-			
-			$order_id   = $out_trade_no; 
-		
-		
-			$trade_no = $this->request->post['trade_no'];
-		
-			$trade_status = $this->request->post['trade_status'];
-			
-			$order_status_id = $this->config->get('config_order_status_id');
-			
-			$this->load->model('checkout/order');
-
-			$order_info = $this->model_checkout_order->getOrder($order_id);
-			
-			if($log) {
-				$this->log->write('Alipay_Direct :: Three: ');
-			}
-			
-			if ($order_info) {
-				
-				if($log) {
-					$this->log->write('Alipay_Direct :: Four: ');
-				}
-				
-			
-				if($_POST['trade_status'] == 'TRADE_FINISHED') {
-				
-					if($log) {
-						$this->log->write('Alipay_Direct :: Five: ');
-					}
-				
-					$order_status_id = $this->config->get('alipay_direct_trade_finished_status_id');
-					
-					if (!$order_info['order_status_id']) {
-						
-						$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', true);
-						
-					} else {
-						
-						$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', true);
-						
-					}
-				
-						
-					echo "success";
-			
-				} else if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
-					
-					if($log) {
-						$this->log->write('Alipay_Direct :: Six: ');
-					}
-				
-					$order_status_id = $this->config->get('alipay_direct_trade_success_status_id');
-					
-					if (!$order_info['order_status_id']) {
-						
-						$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', true);
-						
-					} else {
-						
-						$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, '', true);
-						
-					}
-						
-					echo "success";
-			
-				}
-				
-				//清除sesssion，避免客户返回不到成功页面而无法清除原有的购物车等信息
-				$this->cart->clear();
-				unset($this->session->data['shipping_method']);
-				unset($this->session->data['shipping_methods']);
-				unset($this->session->data['payment_method']);
-				unset($this->session->data['payment_methods']);
-				unset($this->session->data['guest']);
-				unset($this->session->data['comment']);
-				unset($this->session->data['order_id']);
-				unset($this->session->data['coupon']);
-				unset($this->session->data['reward']);
-				unset($this->session->data['voucher']);
-				unset($this->session->data['vouchers']);
-				unset($this->session->data['totals']);
-				if(isset($this->session->data['cs_shipfrom'])) {
-					unset($this->session->data['cs_shipfrom']);
-				}
-				
-				if(isset($this->sesssion->data['personal_card'])) {
-					unset($this->sesssion->data['personal_card']);
-				}
-			
-				
-			}else{
-				
-				if($log) {
-					$this->log->write('Alipay_Direct :: Seven: ');
-				}
-				
-				echo "fail";
-				
-			}
-			
-		} else {
-			
-			if($log) {
-				$this->log->write('Alipay_Direct :: Eight: ');
-			}
-			
-			echo "fail";
-		
-		}
-		
-		
-		
-		
-	}
 
 	
 }

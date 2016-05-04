@@ -24,6 +24,7 @@
     <ul>
       <li><a href="<?php echo $installer; ?>"><?php echo $text_installer; ?></a></li>
       <li><a href="<?php echo $modification; ?>"><?php echo $text_modification; ?></a></li>
+      <li><a href="<?php echo $theme; ?>"><?php echo $text_theme; ?></a></li>
       <li><a href="<?php echo $analytics; ?>"><?php echo $text_analytics; ?></a></li>
       <li><a href="<?php echo $captcha; ?>"><?php echo $text_captcha; ?></a></li>
       <li><a href="<?php echo $feed; ?>"><?php echo $text_feed; ?></a></li>
@@ -52,6 +53,14 @@
           <li><a href="<?php echo $blog; ?>"><?php echo $text_blog; ?></a></li>
           <li><a href="<?php echo $blog_comment; ?>"><?php echo $text_blog_comment; ?></a></li>
           <li><a href="<?php echo $blog_config; ?>"><?php echo $text_blog_config; ?></a></li>
+        </ul>
+      </li>
+      
+      <li><a class="parent"><?php echo $text_faq; ?></a>
+        <ul>
+          <li><a href="<?php echo $faq_category; ?>"><?php echo $text_faq_category; ?></a></li>
+          <li><a href="<?php echo $faq; ?>"><?php echo $text_faq; ?></a></li>
+          <li><a href="<?php echo $faq_config; ?>"><?php echo $text_faq_config; ?></a></li>
         </ul>
       </li>
       
@@ -96,7 +105,7 @@
       <li><a href="<?php echo $contact; ?>"><?php echo $text_contact; ?></a></li>
     </ul>
   </li>
-  <li><a class="parent"><i class="fa fa-search"></i> <span><?php echo $text_baidu_seo; ?></span></a>
+  <li><a class="parent"><i class="fa fa-search fa-fw"></i> <span><?php echo $text_baidu_seo; ?></span></a>
     <ul>
       <li><a href="<?php echo $pushurl; ?>"><?php echo $text_pushurl; ?></a></li>
     </ul>

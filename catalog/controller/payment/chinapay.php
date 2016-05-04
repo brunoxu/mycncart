@@ -1,7 +1,7 @@
 <?php
 class ControllerPaymentChinaPay extends Controller {
 	public function index() {
-		$this->language->load('payment/chinapay');
+		$this->load->language('payment/chinapay');
 
 		$data['text_testmode'] = $this->language->get('text_testmode');		
 
@@ -27,13 +27,10 @@ class ControllerPaymentChinaPay extends Controller {
 
 		 
 		 
-		$data['cancel_return'] = $this->url->link('checkout/checkout', '', 'SSL');
+		$data['cancel_return'] = $this->url->link('checkout/checkout', '', true);
 		
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/chinapay.tpl')) {
-				return $this->load->view($this->config->get('config_template') . '/template/payment/chinapay.tpl', $data);
-			} else {
-				return $this->load->view('default/template/payment/chinapay.tpl', $data);
-			}
+		return $this->load->view('payment/chinapay', $data);
+			
 		
 
 	}

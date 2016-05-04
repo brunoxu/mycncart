@@ -16,7 +16,7 @@ class ModelBlogComment extends Model {
 			$subject = sprintf($this->language->get('text_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
 
 			$message  = $this->language->get('text_waiting') . "\n";
-			$message .= sprintf($this->language->get('text_blog'), html_entity_decode($blog_info['name'], ENT_QUOTES, 'UTF-8')) . "\n";
+			$message .= sprintf($this->language->get('text_blog'), html_entity_decode($blog_info['title'], ENT_QUOTES, 'UTF-8')) . "\n";
 			$message .= sprintf($this->language->get('text_commenter'), html_entity_decode($data['name'], ENT_QUOTES, 'UTF-8')) . "\n";
 			$message .= $this->language->get('text_comment') . "\n";
 			$message .= html_entity_decode($data['text'], ENT_QUOTES, 'UTF-8') . "\n\n";
@@ -60,7 +60,7 @@ class ModelBlogComment extends Model {
 			$limit = 20;
 		}
 
-		$query = $this->db->query("SELECT r.text, r.author, r.text, p.blog_id, pd.title, r.date_added FROM " . DB_PREFIX . "blog_comment r LEFT JOIN " . DB_PREFIX . "blog p ON (r.blog_id = p.blog_id) LEFT JOIN " . DB_PREFIX . "blog_description pd ON (p.blog_id = pd.blog_id) WHERE p.blog_id = '" . (int)$blog_id . "' AND p.status = '1' AND r.status = '1' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY r.date_added DESC LIMIT " . (int)$start . "," . (int)$limit);
+		$query = $this->db->query("SELECT r.text, r.author, r.text, p.blog_id, pd.title, r.date_added FROM " . DB_PREFIX . "blog_comment r LEFT JOIN " . DB_PREFIX . "blog p ON (r.blog_id = p.blog_id) LEFT JOIN " . DB_PREFIX . "blog_description pd ON (p.blog_id = pd.blog_id) WHERE p.blog_id = '" . (int)$blog_id . "' AND p.status = '1' AND r.status = '1' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' ORDER BY r.date_added ASC LIMIT " . (int)$start . "," . (int)$limit);
 
 		return $query->rows;
 	}

@@ -6,7 +6,7 @@ class ControllerPaymentAlipayGuarantee extends Controller {
 		$this->load->helper('alipay_ga_core');
 		$this->load->helper('alipay_ga_md');
 		
-		$this->language->load('payment/alipay_guarantee');
+		$this->load->language('payment/alipay_guarantee');
 
 		$data['button_confirm'] = $this->language->get('button_confirm');
 		
@@ -76,7 +76,7 @@ class ControllerPaymentAlipayGuarantee extends Controller {
 
         $body =  $this->language->get('text_owner') . ' ' . $fullname;
 
-        $show_url = $this->url->link('common/home', '', 'SSL');
+        $show_url = $this->url->link('common/home', '', true);
 
 
         $receive_name = $order_info['payment_fullname'];
@@ -124,11 +124,7 @@ class ControllerPaymentAlipayGuarantee extends Controller {
 		
 		
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/alipay_guarantee.tpl')) {
-			return $this->load->view($this->config->get('config_template') . '/template/payment/alipay_guarantee.tpl', $data);
-		} else {
-			return $this->load->view('default/template/payment/alipay_guarantee.tpl', $data);
-		}
+		return $this->load->view('payment/alipay_guarantee', $data);
 		
 	}
 	

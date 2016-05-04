@@ -2,7 +2,7 @@
 class ControllerPaymentupop extends Controller {
 	public function index() {
 		$this->load->library('upopservice');
-		$this->language->load('payment/upop');
+		$this->load->language('payment/upop');
 		$data['text_testmode'] = $this->language->get('text_testmode');
     	$data['button_confirm'] = $this->language->get('button_confirm');
 
@@ -119,16 +119,12 @@ class ControllerPaymentupop extends Controller {
 		
 		
 		$data['html'] =  $html; 
-		$data['cancel_return'] = $this->url->link('checkout/checkout', '', 'SSL');
+		$data['cancel_return'] = $this->url->link('checkout/checkout', '', true);
 	
 
 
 		
-			if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/upop.tpl')) {
-				return $this->load->view($this->config->get('config_template') . '/template/payment/upop.tpl', $data);
-			} else {
-				return $this->load->view('default/template/payment/chinapay.tpl', $data);
-			}
+		return $this->load->view('payment/chinapay', $data);
 		
 	
 	}

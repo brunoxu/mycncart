@@ -6,7 +6,7 @@ class ControllerPaymentAlipayDirect extends Controller {
 		$this->load->helper('alipay_dt_core');
 		$this->load->helper('alipay_dt_md');
 		
-		$this->language->load('payment/alipay_direct');
+		$this->load->language('payment/alipay_direct');
 
 		$data['button_confirm'] = $this->language->get('button_confirm');
 		
@@ -71,7 +71,7 @@ class ControllerPaymentAlipayDirect extends Controller {
 		
         $body =  $this->language->get('text_owner') . ' ' . $fullname;
 
-        $show_url = $this->url->link('common/home', '', 'SSL');
+        $show_url = $this->url->link('common/home', '', true);
 
         $anti_phishing_key = "";
 
@@ -103,11 +103,7 @@ class ControllerPaymentAlipayDirect extends Controller {
 		
 		
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/alipay_direct.tpl')) {
-			return $this->load->view($this->config->get('config_template') . '/template/payment/alipay_direct.tpl', $data);
-		} else {
-			return $this->load->view('default/template/payment/alipay_direct.tpl', $data);
-		}
+		return $this->load->view('payment/alipay_direct', $data);
 		
 	}
 	

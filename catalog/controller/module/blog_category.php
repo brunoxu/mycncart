@@ -5,8 +5,8 @@ class ControllerModuleBlogCategory extends Controller {
 
 		$data['heading_title'] = $this->language->get('heading_title');
 
-		if (isset($this->request->get['path'])) {
-			$parts = explode('_', (string)$this->request->get['path']);
+		if (isset($this->request->get['way'])) {
+			$parts = explode('_', (string)$this->request->get['way']);
 		} else {
 			$parts = array();
 		}
@@ -42,7 +42,7 @@ class ControllerModuleBlogCategory extends Controller {
 					$children_data[] = array(
 						'blog_category_id' => $child['blog_category_id'], 
 						'name' => $child['name'], 
-						'href' => $this->url->link('blog/category', 'path=' . $blog_category['blog_category_id'] . '_' . $child['blog_category_id'])
+						'href' => $this->url->link('blog/category', 'way=' . $blog_category['blog_category_id'] . '_' . $child['blog_category_id'])
 					);
 				}
 			}
@@ -51,14 +51,11 @@ class ControllerModuleBlogCategory extends Controller {
 				'blog_category_id' => $blog_category['blog_category_id'],
 				'name'        => $blog_category['name'],
 				'children'    => $children_data,
-				'href'        => $this->url->link('blog/category', 'path=' . $blog_category['blog_category_id'])
+				'href'        => $this->url->link('blog/category', 'way=' . $blog_category['blog_category_id'])
 			);
 		}
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/module/blog_category.tpl')) {
-			return $this->load->view($this->config->get('config_template') . '/template/module/blog_category.tpl', $data);
-		} else {
-			return $this->load->view('default/template/module/blog_category.tpl', $data);
-		}
+		return $this->load->view('module/blog_category', $data);
+		
 	}
 }

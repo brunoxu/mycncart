@@ -54,7 +54,7 @@ class ControllerCheckoutQrcodeWxPaySuccess extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_checkout'),
-			'href' => $this->url->link('checkout/checkout', '', 'SSL')
+			'href' => $this->url->link('checkout/checkout', '', true)
 		);
 
 		$data['breadcrumbs'][] = array(
@@ -67,7 +67,7 @@ class ControllerCheckoutQrcodeWxPaySuccess extends Controller {
 
 		$data['code_url'] = $this->session->data['code_url'];
 
-		$data['address'] = $this->url->link('account/address', '', 'SSL');
+		$data['address'] = $this->url->link('account/address', '', true);
 
 
 		$data['button_continue'] = $this->language->get('button_continue');
@@ -81,11 +81,8 @@ class ControllerCheckoutQrcodeWxPaySuccess extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/common/qrcode_wxpay_success.tpl')) {
-			$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/common/qrcode_wxpay_success.tpl', $data));
-		} else {
-			$this->response->setOutput($this->load->view('default/template/common/qrcode_wxpay_success.tpl', $data));
-		}
+		$this->response->setOutput($this->load->view('common/qrcode_wxpay_success', $data));
+		
 	}
 	
 	

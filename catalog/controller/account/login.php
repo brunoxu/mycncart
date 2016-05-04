@@ -7,8 +7,6 @@ class ControllerAccountLogin extends Controller {
 
 		// Login override for admin users
 		if (!empty($this->request->get['token'])) {
-			$this->event->trigger('pre.customer.login');
-
 			$this->customer->logout();
 			$this->cart->clear();
 
@@ -20,7 +18,6 @@ class ControllerAccountLogin extends Controller {
 			unset($this->session->data['shipping_method']);
 			unset($this->session->data['shipping_methods']);
 			unset($this->session->data['comment']);
-			unset($this->session->data['order_id']);
 			unset($this->session->data['coupon']);
 			unset($this->session->data['reward']);
 			unset($this->session->data['voucher']);
@@ -40,14 +37,12 @@ class ControllerAccountLogin extends Controller {
 					$this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
 				}
 
-				
-
-				$this->response->redirect($this->url->link('account/account', '', 'SSL'));
+				$this->response->redirect($this->url->link('account/account', '', true));
 			}
 		}
 
 		if ($this->customer->isLogged()) {
-			$this->response->redirect($this->url->link('account/account', '', 'SSL'));
+			$this->response->redirect($this->url->link('account/account', '', true));
 		}
 
 		$this->load->language('account/login');
@@ -55,9 +50,6 @@ class ControllerAccountLogin extends Controller {
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			// Trigger customer pre login event
-			$this->event->trigger('pre.customer.login');
-
 			// Unset guest
 			unset($this->session->data['guest']);
 
@@ -71,7 +63,7 @@ class ControllerAccountLogin extends Controller {
 			if ($this->config->get('config_tax_customer') == 'shipping') {
 				$this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
 			}
-			
+
 			// Wishlist
 			if (isset($this->session->data['wishlist']) && is_array($this->session->data['wishlist'])) {
 				$this->load->model('account/wishlist');
@@ -82,7 +74,7 @@ class ControllerAccountLogin extends Controller {
 					unset($this->session->data['wishlist'][$key]);
 				}
 			}
-			
+
 			// Add to activity log
 			$this->load->model('account/activity');
 
@@ -92,16 +84,12 @@ class ControllerAccountLogin extends Controller {
 			);
 
 			$this->model_account_activity->addActivity('login', $activity_data);
-			
-			// Trigger customer post login event
-			$this->event->trigger('post.customer.login');
 
-
-			// Added strpos check to pass McAfee PCI compliance test (http://forum.mycncart.com/viewtopic.php?f=10&t=12043&p=151494#p151295)
+			// Added strpos check to pass McAfee PCI compliance test (http://forum.opencart.com/viewtopic.php?f=10&t=12043&p=151494#p151295)
 			if (isset($this->request->post['redirect']) && (strpos($this->request->post['redirect'], $this->config->get('config_url')) !== false || strpos($this->request->post['redirect'], $this->config->get('config_ssl')) !== false)) {
 				$this->response->redirect(str_replace('&amp;', '&', $this->request->post['redirect']));
 			} else {
-				$this->response->redirect($this->url->link('account/account', '', 'SSL'));
+				$this->response->redirect($this->url->link('account/account', '', true));
 			}
 		}
 
@@ -114,12 +102,12 @@ class ControllerAccountLogin extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_account'),
-			'href' => $this->url->link('account/account', '', 'SSL')
+			'href' => $this->url->link('account/account', '', true)
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_login'),
-			'href' => $this->url->link('account/login', '', 'SSL')
+			'href' => $this->url->link('account/login', '', true)
 		);
 
 		$data['heading_title'] = $this->language->get('heading_title');
@@ -137,17 +125,59 @@ class ControllerAccountLogin extends Controller {
 		$data['button_continue'] = $this->language->get('button_continue');
 		$data['button_login'] = $this->language->get('button_login');
 
-		if (isset($this->error['warning'])) {
+		if (isset($this->session->data['error'])) {
+			$data['error_warning'] = $this->session->data['error'];
+
+			unset($this->session->data['error']);
+		} elseif (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
 		} else {
 			$data['error_warning'] = '';
 		}
+		
+		if (isset($this->session->data['weixin_login_warning'])) {
+			$data['error_weixin_login_warning'] = $this->session->data['weixin_login_warning'];
+			unset($this->session->data['weixin_login_warning']);
+		} else {
+			$data['error_weixin_login_warning'] = '';
+		}
+		
+		if (isset($this->session->data['weibo_login_warning'])) {
+			$data['error_weibo_login_warning'] = $this->session->data['weibo_login_warning'];
+			unset($this->session->data['weibo_login_warning']);
+		} else {
+			$data['error_weibo_login_warning'] = '';
+		}
+		
+		/*
+		//weixin login button
+		$this->load->helper('mobile');
+		if(is_weixin()) {
+			$data['is_weixin'] = 1;
+			
+		}else{
+			$data['is_weixin'] = 0;
+		}
+		
+		if(is_mobile()) {
+			$data['is_mobile'] = 1;
+			
+		}else{
+			$data['is_mobile'] = 0;
+		}
+		
+		$data['weixin_login'] = $this->url->link('account/weixin_login', '', true);
+		
+		$data['wxpclogin_url'] = 'https://open.weixin.qq.com/connect/qrconnect?appid=' . trim($this->config->get('wx_login_appid')) . '&redirect_uri='.urlencode(HTTPS_SERVER.'index.php?route=account/weixin_login/weixin_pclogin_code').'&response_type=code&scope=snsapi_login&state=STATE#wechat_redirect';
+		
+		*/
+		
 
-		$data['action'] = $this->url->link('account/login', '', 'SSL');
-		$data['register'] = $this->url->link('account/register', '', 'SSL');
-		$data['forgotten'] = $this->url->link('account/forgotten', '', 'SSL');
+		$data['action'] = $this->url->link('account/login', '', true);
+		$data['register'] = $this->url->link('account/register', '', true);
+		$data['forgotten'] = $this->url->link('account/forgotten', '', true);
 
-		// Added strpos check to pass McAfee PCI compliance test (http://forum.mycncart.com/viewtopic.php?f=10&t=12043&p=151494#p151295)
+		// Added strpos check to pass McAfee PCI compliance test (http://forum.opencart.com/viewtopic.php?f=10&t=12043&p=151494#p151295)
 		if (isset($this->request->post['redirect']) && (strpos($this->request->post['redirect'], $this->config->get('config_url')) !== false || strpos($this->request->post['redirect'], $this->config->get('config_ssl')) !== false)) {
 			$data['redirect'] = $this->request->post['redirect'];
 		} elseif (isset($this->session->data['redirect'])) {
@@ -185,16 +215,10 @@ class ControllerAccountLogin extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/account/login.tpl')) {
-			$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/account/login.tpl', $data));
-		} else {
-			$this->response->setOutput($this->load->view('default/template/account/login.tpl', $data));
-		}
+		$this->response->setOutput($this->load->view('account/login', $data));
 	}
 
 	protected function validate() {
-		$this->event->trigger('pre.customer.login');
-
 		// Check how many login attempts have been made.
 		$login_info = $this->model_account_customer->getLoginAttempts($this->request->post['email']);
 
@@ -216,7 +240,6 @@ class ControllerAccountLogin extends Controller {
 				$this->model_account_customer->addLoginAttempt($this->request->post['email']);
 			} else {
 				$this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
-
 			}
 		}
 
