@@ -4,8 +4,8 @@ $_['site_base']         = substr(HTTP_SERVER, 7);
 $_['site_ssl']          = false;
 
 // Language
-$_['language_default']  = 'en-gb';
-$_['language_autoload'] = array('en-gb');
+$_['language_default']  = 'zh-CN';
+$_['language_autoload'] = array('zh-CN');
 
 // Actions
 $_['action_default']    = 'install/step_1';

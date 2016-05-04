@@ -1,4 +1,4 @@
-﻿SET SQL_MODE = "";
+SET SQL_MODE = "";
 DROP TABLE IF EXISTS `mcc_address`;
 CREATE TABLE `mcc_address` (
   `address_id` int(11) NOT NULL AUTO_INCREMENT,
