@@ -70,7 +70,6 @@ class ModelAccountOrder extends Model {
 				'shipping_company'        => $order_query->row['shipping_company'],
 				'shipping_address'      => $order_query->row['shipping_address'],
 				'shipping_postcode'       => $order_query->row['shipping_postcode'],
-				'shipping_telephone'       => $order_query->row['shipping_telephone'],
 				'shipping_city'           => $order_query->row['shipping_city'],
 				'shipping_zone_id'        => $order_query->row['shipping_zone_id'],
 				'shipping_zone'           => $order_query->row['shipping_zone'],
@@ -163,5 +162,17 @@ class ModelAccountOrder extends Model {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "order_voucher` WHERE order_id = '" . (int)$order_id . "'");
 
 		return $query->row['total'];
+	}
+	
+	public function getWxQrcodeUnpaidOrder($order_id) {
+		$order_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order` WHERE order_id = '" . (int)$order_id . "' AND customer_id = '" . (int)$this->customer->getId() . "' AND order_status_id > '0'");
+
+		if ($order_query->num_rows) {
+			return array(
+				'order_id'	=> $order_query->row['order_id']
+			);
+		} else {
+			return false;
+		}
 	}
 }

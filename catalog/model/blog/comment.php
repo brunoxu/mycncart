@@ -29,7 +29,7 @@ class ModelBlogComment extends Model {
 			$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
 			$mail->smtp_port = $this->config->get('config_mail_smtp_port');
 			$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-
+			
 			$mail->setTo($this->config->get('config_email'));
 			$mail->setFrom($this->config->get('config_email'));
 			$mail->setSender(html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
@@ -37,18 +37,17 @@ class ModelBlogComment extends Model {
 			$mail->setText($message);
 			$mail->send();
 
-			// Send to additional alert emails
-			$emails = explode(',', $this->config->get('config_mail_alert'));
+			// Send to additional alert emails if new account email is enabled
+			$emails = explode(',', $this->config->get('config_alert_email'));
 
 			foreach ($emails as $email) {
-				if ($email && preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $email)) {
+				if (utf8_strlen($email) > 0 && filter_var($email, FILTER_VALIDATE_EMAIL)) {
 					$mail->setTo($email);
 					$mail->send();
 				}
 			}
 		}
 
-		$this->event->trigger('post.comment.add', $comment_id);
 	}
 	
 	public function getCommentsByBlogId($blog_id, $start = 0, $limit = 20) {

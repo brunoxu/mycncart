@@ -126,10 +126,9 @@ class ModelBlogBlog extends Model {
 	
 			$sql .= " GROUP BY p.blog_id";
 	
-				$sql .= " ORDER BY p.date_added";
+			$sql .= " ORDER BY p.date_added";
 			
-	
-				$sql .= " ASC, LCASE(pd.title) ASC";
+			$sql .= " DESC";
 	
 			if (isset($data['start']) || isset($data['limit'])) {
 				if ($data['start'] < 0) {
@@ -264,6 +263,58 @@ class ModelBlogBlog extends Model {
 
 		$query = $this->db->query("SELECT bcd.name, bcd.blog_category_id, bcd.language_id FROM " . DB_PREFIX . "blog_to_blog_category btbc LEFT JOIN " . DB_PREFIX . "blog_category_description bcd ON (btbc.blog_category_id = bcd.blog_category_id) WHERE btbc.blog_id = '" . (int)$blog_id . "' AND bcd.language_id = '" . (int)$this->config->get('config_language_id') . "'");
 
+
+		return $query->rows;
+	}
+	
+	private function prepareImage($path, $width, $height)
+    {
+        if(!$width) $width = 1000;
+        if(!$height) $height = 400;
+        $path = $this->model_tool_image->resize($path, $width, $height);
+        return  '<img src="'. $path . '" alt="media" />';
+
+    }
+    
+    private function prepareYoutube($path, $width, $height)
+    {
+        if(!$width) $width = '100%';
+        if(!$height) $height = 400;
+        preg_match('/[\\?\\&]v=([^\\?\\&]+)/', $path, $matches);
+        $id = isset($matches[1]) ? $matches[1] : 0;
+        $path = "https://www.youtube.com/embed/". $id ."?rel=0&showinfo=0&color=white&iv_load_policy=3";
+    
+        return '<iframe id="ytplayer" type="text/html" width="'.$width.'" height="'.$height.'"
+                                src="'. $path.'"
+                                frameborder="0" allowfullscreen></iframe> ';
+    }
+    
+    private function prepareSoundCloud($path, $width, $height)
+    {
+        if(!$width) $width = '100%';
+        if(!$height) $height = 170;
+        
+        if(!@file_get_contents('http://soundcloud.com/oembed?format=js&url='.$path.'&iframe=true')) return false;
+        $getValues=file_get_contents('http://soundcloud.com/oembed?format=js&url='.$path.'&iframe=true');
+        $decodeiFrame=substr($getValues, 1, -2);
+        $jsonObj = json_decode($decodeiFrame);
+        return str_replace(array( 'height="400"', 'width="100%"'),array('height="'.$height.'"', 'width="'.$width.'"'), $jsonObj->html);
+        
+    }
+	
+	public function getPopularBlogs($limit) {
+		$sql = "SELECT *, ba.blog_id FROM " . DB_PREFIX . "blog ba
+                LEFT JOIN " . DB_PREFIX . "blog_description bad ON (ba.blog_id = bad.blog_id)
+                LEFT JOIN " . DB_PREFIX . "blog_to_blog_category bctc ON bctc.blog_id = ba.blog_id
+                LEFT JOIN " . DB_PREFIX . "blog_to_store ba2s ON (ba.blog_id = ba2s.blog_id)
+                WHERE bad.language_id = '" . (int)$this->config->get('config_language_id') . "'
+                    AND ba.status = 1 AND ba2s.store_id = '" . (int)$this->config->get('config_store_id') . "' AND ba.date_added < NOW()
+                GROUP BY ba.blog_id
+                ORDER BY (SELECT count(*) FROM " . DB_PREFIX . "blog_comment bc WHERE bc.blog_id = ba.blog_id) DESC, ba.date_added  DESC
+                LIMIT " . (int)$limit . "
+                ";
+
+		$query = $this->db->query($sql);
 
 		return $query->rows;
 	}
