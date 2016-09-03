@@ -1,7 +1,7 @@
 <?php
 
 // Locale
-$_['code']                          = 'cn';
+$_['code']                          = 'zh-cn';
 $_['direction']                     = 'ltr';
 $_['date_format_short']             = 'Y-m-d';
 $_['date_format_long']              = 'l dS F Y';

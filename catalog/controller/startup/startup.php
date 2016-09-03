@@ -50,6 +50,14 @@ class ControllerStartupStartup extends Controller {
 			$code = $this->request->cookie['language'];
 		}
 		
+		if (!array_key_exists($code, $languages)) {
+			$code = $this->config->get('config_language');
+		}
+		
+		if (!array_key_exists($code, $languages)) {
+			$code = key($languages);
+		}
+		
 		// Language Detection
 		if (!empty($this->request->server['HTTP_ACCEPT_LANGUAGE']) && !array_key_exists($code, $languages)) {
 			$detect = '';
@@ -59,18 +67,16 @@ class ControllerStartupStartup extends Controller {
 			// Try using local to detect the language
 			foreach ($browser_languages as $browser_language) {
 				foreach ($languages as $key => $value) {
-					if ($value['status']) {
-						$locale = explode(',', $value['locale']);
-						
-						if (in_array($browser_language, $locale)) {
-							$detect = $key;
-							break 2;
-						}
+					$locale = explode(',', $value['locale']);
+					
+					if (in_array($browser_language, $locale)) {
+						$detect = $key;
+						break 2;
 					}
-				}	
-			}			
+				}
+			}
 			
-			if (!$detect) { 
+			if (!$detect) {
 				// Try using language folder to detect the language
 				foreach ($browser_languages as $browser_language) {
 					if (array_key_exists(strtolower($browser_language), $languages)) {
@@ -82,10 +88,6 @@ class ControllerStartupStartup extends Controller {
 			}
 			
 			$code = $detect ? $detect : '';
-		}
-		
-		if (!array_key_exists($code, $languages)) {
-			$code = $this->config->get('config_language');
 		}
 		
 		if (!isset($this->session->data['language']) || $this->session->data['language'] != $code) {
@@ -146,6 +148,10 @@ class ControllerStartupStartup extends Controller {
 		
 		if (!array_key_exists($code, $currencies)) {
 			$code = $this->config->get('config_currency');
+		}
+		
+		if (!array_key_exists($code, $currencies)) {
+			$code = key($currencies);
 		}
 		
 		if (!isset($this->session->data['currency']) || $this->session->data['currency'] != $code) {

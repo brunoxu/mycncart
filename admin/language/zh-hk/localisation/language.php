@@ -1,5 +1,4 @@
 <?php
-
 // Heading
 $_['heading_title']     = '語言';
 
@@ -13,6 +12,7 @@ $_['text_edit']         = '編輯語言';
 $_['column_name']       = '語言名稱';
 $_['column_code']       = '代碼';
 $_['column_sort_order'] = '排序';
+$_['column_status']     = '狀態';
 $_['column_action']     = '操作';
 
 // Entry

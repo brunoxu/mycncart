@@ -211,6 +211,7 @@ class ControllerLocalisationCurrency extends Controller {
 				'code'          => $result['code'],
 				'value'         => $result['value'],
 				'date_modified' => date($this->language->get('date_format_short'), strtotime($result['date_modified'])),
+				'status'        => $result['status'],
 				'edit'          => $this->url->link('localisation/currency/edit', 'token=' . $this->session->data['token'] . '&currency_id=' . $result['currency_id'] . $url, true)
 			);
 		}
@@ -225,6 +226,7 @@ class ControllerLocalisationCurrency extends Controller {
 		$data['column_code'] = $this->language->get('column_code');
 		$data['column_value'] = $this->language->get('column_value');
 		$data['column_date_modified'] = $this->language->get('column_date_modified');
+		$data['column_status'] = $this->language->get('column_status');
 		$data['column_action'] = $this->language->get('column_action');
 
 		$data['button_add'] = $this->language->get('button_add');

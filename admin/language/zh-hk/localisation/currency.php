@@ -1,5 +1,4 @@
 <?php
-
 // Heading
 $_['heading_title']        = '貨幣';
 
@@ -15,6 +14,7 @@ $_['column_title']         = '貨幣標題';
 $_['column_code']          = '代碼';
 $_['column_value']         = '值';
 $_['column_date_modified'] = '最新更新';
+$_['column_status']        = '狀態';
 $_['column_action']        = '操作';
 
 // Entry

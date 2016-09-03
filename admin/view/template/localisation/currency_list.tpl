@@ -55,6 +55,7 @@
                     <?php } else { ?>
                     <a href="<?php echo $sort_date_modified; ?>"><?php echo $column_date_modified; ?></a>
                     <?php } ?></td>
+                  <td class="text-left"><?php echo $column_status; ?></td>
                   <td class="text-right"><?php echo $column_action; ?></td>
                 </tr>
               </thead>
@@ -71,6 +72,7 @@
                   <td class="text-left"><?php echo $currency['code']; ?></td>
                   <td class="text-right"><?php echo $currency['value']; ?></td>
                   <td class="text-left"><?php echo $currency['date_modified']; ?></td>
+                  <td class="text-left"><?php echo $currency['status']; ?></td>
                   <td class="text-right"><a href="<?php echo $currency['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a></td>
                 </tr>
                 <?php } ?>
